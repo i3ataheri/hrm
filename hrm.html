@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معالم الحرمين الشريفين</title>
+    <style>
+        :root {
+            /* المعلمات اللونية */
+            --الخلفية: #050505;
+            --الذهب: #c5a059;
+            --الكريستال: rgba(255, 255, 255, 0.1);
+            --نص_أبيض: #ffffff;
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: var(--الخلفية);
+            color: var(--نص_أبيض);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            overflow: hidden;
+        }
+
+        /* تصویر پس‌زمینه با افکت محو شدگی */
+        #المشهد_الرئيسي {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+        }
+
+        .غطاء_داكن {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.8) 100%);
+            z-index: 2;
+        }
+
+        /* منوی زبان ثابت و ایمن */
+        .منطقة_اللغات {
+            position: fixed;
+            top: 25px;
+            left: 25px; /* تنظیم شده برای عدم تداخل */
+            z-index: 1000;
+            display: flex;
+            gap: 8px;
+            background: var(--الكريستال);
+            padding: 5px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .زر_اللغة {
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+            background: transparent;
+            color: white;
+            font-weight: bold;
+        }
+
+        .زر_اللغة.نشط {
+            background: var(--الذهب);
+            color: black;
+        }
+
+        /* بخش محتوا در قسمت بالاتر */
+        .مركز_المعلومات {
+            position: relative;
+            z-index: 10;
+            padding: 120px 8% 0 8%; /* متن بالاتر آمد */
+            max-width: 800px;
+            pointer-events: none;
+        }
+
+        .عنوان_المعلم {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            margin: 0;
+            font-weight: 100;
+            color: var(--الذهب);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        .وصف_المعلم {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            line-height: 1.8;
+            margin-top: 20px;
+            max-width: 600px;
+            opacity: 0.9;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* ناوبری پایینی */
+        .تصفح_المواقع {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 25px;
+        }
+
+        .نقطة {
+            font-size: 10px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: 0.4s;
+        }
+
+        .نقطة.نشطة {
+            opacity: 1;
+            color: var(--الذهب);
+            border-bottom: 1px solid var(--الذهب);
+        }
+
+        /* لودینگ ساده */
+        .جار_التحميل {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--الذهب);
+            z-index: 2000;
+            transition: width 0.4s;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="تحميل" class="جار_التحميل" style="width: 0%"></div>
+
+    <div id="المشهد_الرئيسي">
+        <div class="غطاء_داكن"></div>
+    </div>
+
+    <nav class="منطقة_اللغات">
+        <button class="زر_اللغة نشط" onclick="تغيير_اللغة('fa', this)">FA</button>
+        <button class="زر_اللغة" onclick="تغيير_اللغة('ar', this)">AR</button>
+        <button class="زر_اللغة" onclick="تغيير_اللغة('en', this)">EN</button>
+    </nav>
+
+    <main class="مركز_المعلومات">
+        <h1 id="عنوان" class="عنوان_المعلم">المسجد الحرام</h1>
+        <p id="وصف" class="وصف_المعلم">در حال بارگذاری...</p>
+    </main>
+
+    <footer class="تصفح_المواقع">
+        <div class="نقطة نشطة" onclick="تبديل_المكان('haram', this)">HARAM</div>
+        <div class="نقطة" onclick="تبديل_المكان('nabawi', this)">NABAWI</div>
+        <div class="نقطة" onclick="تبديل_المكان('hira', this)">HIRA</div>
+    </footer>
+
+    <script>
+        const المعطيات = {
+            'haram': {
+                fa: { اسم: "مسجد الحرام", متن: "مقدس‌ترین مکان در جهان اسلام، آغوش گرم کعبه و قبله‌گاه دل‌های مؤمنان." },
+                ar: { اسم: "المسجد الحرام", متن: "قبلة المسلمين ومهبط الوحي، يضم الكعبة المشرفة ومقام إبراهيم عليه السلام." },
+                en: { اسم: "The Grand Mosque", متن: "The holiest site in Islam, home to the Holy Kaaba and the destination of millions." },
+                صورة: "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=2000"
+            },
+            'nabawi': {
+                fa: { اسم: "مسجد النبی", متن: "شهر پیامبر، مدینه منوره؛ جایی که آرامش در روضه رضوان معنا می‌یابد." },
+                ar: { اسم: "المسجد النبوي", متن: "مسجد النبي ﷺ في المدينة المنورة، منبع الأنوار والسكينة الروحية." },
+                en: { اسم: "Prophet's Mosque", متن: "Located in the heart of Medina, a sanctuary of peace and the final resting place of the Prophet." },
+                صورة: "https://images.unsplash.com/photo-1564769662533-4f00a87b4056?q=80&w=2000"
+            },
+            'hira': {
+                fa: { اسم: "غار حرا", متن: "بر فراز جبل‌النور، جایی که اولین کلمات پروردگار بر قلب محمد (ص) نازل شد." },
+                ar: { اسم: "غار حراء", متن: "في أعلى جبل النور، المكان الذي شهد نزول أولى آيات القرآن الكريم." },
+                en: { اسم: "Hira Cave", متن: "Located atop Mount Noor, where the first verses of the Quran were revealed." },
+                صورة: "https://images.unsplash.com/photo-1610448721566-47369c768e70?q=80&w=2000"
+            }
+        };
+
+        let اللغة_الحالية = 'fa';
+        let المكان_الحالي = 'haram';
+
+        function تغيير_اللغة(لغة, زر) {
+            اللغة_الحالية = لغة;
+            // بروزرسانی دکمه‌های زبان
+            document.querySelectorAll('.زر_اللغة').forEach(b => b.classList.remove('نشط'));
+            زر.classList.add('نشط');
+            
+            // تغییر جهت صفحه
+            document.documentElement.dir = (لغة === 'en') ? 'ltr' : 'rtl';
+            
+            تحديث_المحتوى();
+        }
+
+        function تبديل_المكان(کد, عنصر) {
+            المکان_الحالي = کد;
+            // بروزرسانی نقاط ناوبری
+            document.querySelectorAll('.نقطة').forEach(n => n.classList.remove('نشطة'));
+            عنصر.classList.add('نشطة');
+            
+            // افکت لودینگ تصویر
+            document.getElementById('تحميل').style.width = '100%';
+            
+            const صورة_جديدة = new Image();
+            صورة_جديدة.src = المعطيات[کد].صورة;
+            صورة_جديدة.onload = () => {
+                document.getElementById('المشهد_الرئيسي').style.backgroundImage = `url('${صورة_جديدة.src}')`;
+                document.getElementById('تحميل').style.width = '0%';
+                تحديث_المحتوى();
+            };
+        }
+
+        function تحديث_المحتوى() {
+            const داتا = المعطيات[المکان_الحالي][اللغة_الحالية];
+            document.getElementById('عنوان').innerText = داتا.اسم;
+            document.getElementById('وصف').innerText = داتا.متن;
+        }
+
+        // شروع اولیه
+        تبديل_المكان('haram', document.querySelector('.نقطة'));
+    </script>
+</body>
+</html>
